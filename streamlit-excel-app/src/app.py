@@ -105,29 +105,8 @@ def main():
             final_output["Date OKWV"] = final_output["Date OKWV"].dt.strftime("%d-%m-%Y")
             final_output["Begin Guarantee"] = final_output["Begin Guarantee"].dt.strftime("%d-%m-%Y")
 
-            # Maak een lege DataFrame met de gewenste kolommen
-            final_columns = [
-                "Equipment Number",
-                "Date valid from",
-                "Equipment category",
-                "Description",
-                "Sold to partner",
-                "Ship to partner",
-                "Material Number",
-                "Serial number",
-                "Begin Guarantee",
-                "Warranty end date",
-                "Indicator, Whether Technical Object Should Inherit Warranty",
-                "Indicator: Pass on Warranty",
-                "Construction year",
-                "Construction month"
-            ]
-            final_output = pd.DataFrame(columns=final_columns)
-
-            # TODO: Vul final_output met de juiste data uit je merge/resultaten
-
-            # Preview van de finale output na alle filters en merges
-            st.subheader("Preview finale output na filtering en merge")
+            # Preview van de gefilterde en gemergede data
+            st.subheader("Preview gefilterde en gemergede data")
             st.dataframe(final_output)
 
             st.subheader("Final Output Data")
