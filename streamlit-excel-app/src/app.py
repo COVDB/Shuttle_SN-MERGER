@@ -43,6 +43,27 @@ def main():
             st.subheader("Gefilterde AM LOG Data")
             st.dataframe(filtered_am_log)
             st.write(f"Aantal overgebleven lijnen na filtering: {len(filtered_am_log)}")
+
+            # Merge gefilterde AM LOG met ZSD_PO_PER_SO op Customer Reference / Purch.Doc.
+            merged_data = filtered_am_log.merge(
+                zsd_po_data,
+                left_on="Customer Reference",
+                right_on="Purch.Doc.",
+                how="inner"
+            )
+
+            # Selecteer gewenste kolommen uit beide datasets
+            output_data = merged_data[[
+                "Serial number",
+                "Customer Reference",
+                "Delivery Date",
+                "Material",
+                "Document"
+            ]]
+
+            st.subheader("Gecombineerde Output Data")
+            st.dataframe(output_data)
+            st.write(f"Aantal lijnen in output: {len(output_data)}")
         else:
             st.error("Please upload all three Excel files.")
 
