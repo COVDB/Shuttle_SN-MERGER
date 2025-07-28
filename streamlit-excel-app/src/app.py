@@ -42,6 +42,7 @@ def main():
 
             st.subheader("Gefilterde AM LOG Data")
             st.dataframe(filtered_am_log)
+            st.write(f"Aantal overgebleven lijnen na filtering: {len(filtered_am_log)}")
         else:
             st.error("Please upload all three Excel files.")
 
