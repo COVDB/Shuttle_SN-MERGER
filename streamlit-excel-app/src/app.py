@@ -69,10 +69,30 @@ def main():
             st.dataframe(output_data)
             st.write(f"Aantal lijnen in output: {len(output_data)}")
             
-            st.write(filtered_am_log["Customer Reference"].unique())
-            st.write(zsd_po_data["Purch.Doc."].unique())
-            st.write(filtered_am_log["Customer Reference"].isnull().sum())
-            st.write(zsd_po_data["Purch.Doc."].isnull().sum())
+            # Tweede filter: alleen gewenste Material referenties
+            allowed_materials = [
+                "ATL3.2_12X8N/H", "ATL3.3_12X10CM", "ATL3.3_12X12N/H", "ATL3.3_12X10C", "ATL3.3_12X10N",
+                "ATL3.3_12X8C", "ATL3.3_12X8N", "ATL3.3_10X12N", "ATL3.3_12X8NM", "ATL3.3_115X100N",
+                "ATL3.3_12X10NM", "ATL3.3_12X12N UL", "ATL3.3_12X10NM/H", "ATL3.3_12X8N/H", "ATL3.3_12X8N/L1",
+                "ATL3.3_12X10NW", "ATL3.3_10X12N FCC", "ATL3.3_12X10N/H", "ATL3.3_12X8NM/H", "ATL3.3_12X8C/H",
+                "ATL3.3_114X114N", "ATL3.3_12X12NW", "ATL3.3_114X114N/H", "ATL3.3_12X12N", "ATL3.3_10X12C FCC",
+                "ATL3.3_10X12C UL", "ATL3.2_12X10N", "ATL3.2_12X10C", "ATL3.3_10X12N UL", "ATL3.3_12X10NM/L1",
+                "ATL3.2_12X8C", "ATL3.3_12X10CC", "ATL3.2_12X10N/H", "ATL3.2_12X8N", "NST-ATL3.2-0000001",
+                "ATL3.2_10X12N UL", "ATL3.3_116X116C", "ATL3.2_12X10NS", "ATL3.3_114X114C", "ATL3.1_12X10N",
+                "ATL3.3_12X8NW UL", "ATL3.2_12X12N", "ATL3.2_116X116N", "ATL3.2_12X10NM", "ATL3.2_10X12C UL",
+                "ATL3.3_12X12C", "ATL3.2_12X8NS/H", "ATL3.3_12X8NW/H", "ATL3.3_12X8CW", "ATL3.2_114X114N",
+                "ATL3.2_12X8NM/H", "ATL3.2_10X12CC UL", "ATL3.2_12X12N UL", "ATL3.2_10X12N", "ATL3.2_12X10NW",
+                "ATL3.2_12X8NM", "ATL3.2_115X100N", "ATL3.2_12X10NM/H", "ATL3.1_12X8N", "ATL3.2_12X12C",
+                "ATL3.2_10X12C", "ATL3.2_12X8NS", "ATL3.1_12X10C", "ATL3.2_12X10C UL", "ATL3.2_12X10C/H",
+                "ATL3.2_116X116NN", "ATL3.1_12X10NS", "ATL3.2_12X10CC", "ATL3.2_12X10NS/H", "ATL3.2_12X10NW/H",
+                "ATL3.1_114X114N", "ATL3.2_115X100NS", "ATL3.2_114X114NS", "ATL3.1_12X8C", "ATL3.1_12X12N",
+                "ATL3.1_114X114C", "ATL03_12X10N"
+            ]
+            output_data = output_data[output_data["Material"].isin(allowed_materials)]
+
+            st.subheader("Gecombineerde Output Data (na Material-filter)")
+            st.dataframe(output_data)
+            st.write(f"Aantal lijnen in output: {len(output_data)}")
         else:
             st.error("Please upload all three Excel files.")
 
