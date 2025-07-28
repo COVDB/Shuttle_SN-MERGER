@@ -45,8 +45,8 @@ def main():
             st.write(f"Aantal overgebleven lijnen na filtering: {len(filtered_am_log)}")
 
             # Zorg dat de merge kolommen strings zijn
-            filtered_am_log["Customer Reference"] = filtered_am_log["Customer Reference"].str.strip()
-            zsd_po_data["Purch.Doc."] = zsd_po_data["Purch.Doc."].str.strip()
+            filtered_am_log["Customer Reference"] = filtered_am_log["Customer Reference"].astype(str).str.strip()
+            zsd_po_data["Purch.Doc."] = zsd_po_data["Purch.Doc."].astype(str).str.strip()
 
             # Merge gefilterde AM LOG met ZSD_PO_PER_SO op Customer Reference / Purch.Doc.
             merged_data = filtered_am_log.merge(
