@@ -44,9 +44,9 @@ def main():
             st.dataframe(filtered_am_log)
             st.write(f"Aantal overgebleven lijnen na filtering: {len(filtered_am_log)}")
 
-            # Zorg dat de merge kolommen strings zijn
+            # Zorg dat de merge kolommen strings zijn en verwijder .0 indien nodig
             filtered_am_log["Customer Reference"] = filtered_am_log["Customer Reference"].astype(str).str.strip()
-            zsd_po_data["Purch.Doc."] = zsd_po_data["Purch.Doc."].astype(str).str.strip()
+            zsd_po_data["Purch.Doc."] = zsd_po_data["Purch.Doc."].apply(lambda x: str(int(x)) if pd.notnull(x) and str(x).endswith('.0') else str(x)).str.strip()
 
             # Merge gefilterde AM LOG met ZSD_PO_PER_SO op Customer Reference / Purch.Doc.
             merged_data = filtered_am_log.merge(
