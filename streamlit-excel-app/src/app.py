@@ -5,10 +5,14 @@ from utils.excel_loader import load_am_log, load_zsd_po_per_so, load_zstatus
 def main():
     st.title("Excel File Upload and Processing")
 
-    st.header("Upload Excel Files")
-    am_log_file = st.file_uploader("Upload AM LOG Excel file", type=["xlsx"])
-    zsd_po_file = st.file_uploader("Upload ZSD_PO_PER_SO Excel file", type=["xlsx"])
-    zstatus_file = st.file_uploader("Upload ZSTATUS Excel file", type=["xlsx"])
+    # Layout: uploaders links, preview slider rechts
+    col1, col2 = st.columns([1, 2])
+    with col1:
+        st.header("Upload Excel Files")
+        am_log_file = st.file_uploader("Upload AM LOG Excel file", type=["xlsx"])
+        zsd_po_file = st.file_uploader("Upload ZSD_PO_PER_SO Excel file", type=["xlsx"])
+        zstatus_file = st.file_uploader("Upload ZSTATUS Excel file", type=["xlsx"])
+        preview = st.toggle("Toon tijdelijke previews", value=True)
 
     if st.button("Process Files"):
         if am_log_file and zsd_po_file and zstatus_file:
@@ -16,14 +20,14 @@ def main():
             zsd_po_data = load_zsd_po_per_so(zsd_po_file)
             zstatus_data = load_zstatus(zstatus_file)
 
-            st.subheader("AM LOG Data")
-            st.write(am_log_data)
-
-            st.subheader("ZSD_PO_PER_SO Data")
-            st.write(zsd_po_data)
-
-            st.subheader("ZSTATUS Data")
-            st.write(zstatus_data)
+            if preview:
+                with col2:
+                    st.subheader("AM LOG Data")
+                    st.write(am_log_data)
+                    st.subheader("ZSD_PO_PER_SO Data")
+                    st.write(zsd_po_data)
+                    st.subheader("ZSTATUS Data")
+                    st.write(zstatus_data)
 
             # Filter AM LOG data
             material_numbers = [
