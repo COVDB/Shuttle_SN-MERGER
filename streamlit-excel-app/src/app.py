@@ -126,6 +126,10 @@ def main():
 
             # TODO: Vul final_output met de juiste data uit je merge/resultaten
 
+            # Preview van de finale output na alle filters en merges
+            st.subheader("Preview finale output na filtering en merge")
+            st.dataframe(final_output)
+
             st.subheader("Final Output Data")
             st.dataframe(final_output)
             st.write(f"Aantal lijnen in final output: {len(final_output)}")
