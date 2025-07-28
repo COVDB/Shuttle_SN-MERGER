@@ -18,6 +18,15 @@ def main():
             zsd_po_data = load_zsd_po_per_so(zsd_po_file)
             zstatus_data = load_zstatus(zstatus_file)
 
+            # Preview vensters tonen als schakelaar actief is
+            if preview:
+                st.subheader("Preview AM LOG Data")
+                st.dataframe(am_log_data)
+                st.subheader("Preview ZSD_PO_PER_SO Data")
+                st.dataframe(zsd_po_data)
+                st.subheader("Preview ZSTATUS Data")
+                st.dataframe(zstatus_data)
+
             # Filter AM LOG data
             material_numbers = [
                 "000000000001001917", "000000000001001808", "000000000001001749", "000000000001001776",
