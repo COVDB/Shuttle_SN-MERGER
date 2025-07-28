@@ -113,6 +113,11 @@ def main():
             final_output["Date OKWV"] = pd.to_datetime(final_output["Date OKWV"], errors="coerce")
             final_output["Begin Guarantee"] = final_output["Date OKWV"] + pd.DateOffset(months=2)
 
+            # Zet datumkolommen om naar DD-MM-YYYY formaat
+            final_output["Delivery Date"] = final_output["Delivery Date"].dt.strftime("%d-%m-%Y")
+            final_output["Date OKWV"] = final_output["Date OKWV"].dt.strftime("%d-%m-%Y")
+            final_output["Begin Guarantee"] = final_output["Begin Guarantee"].dt.strftime("%d-%m-%Y")
+
             st.subheader("Final Output Data (met ZSTATUS info en Begin Guarantee)")
             st.dataframe(final_output)
             st.write(f"Aantal lijnen in final output: {len(final_output)}")
