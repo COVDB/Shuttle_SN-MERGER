@@ -5,29 +5,18 @@ from utils.excel_loader import load_am_log, load_zsd_po_per_so, load_zstatus
 def main():
     st.title("Excel File Upload and Processing")
 
-    # Layout: uploaders links, preview slider rechts
-    col1, col2 = st.columns([1, 2])
-    with col1:
-        st.header("Upload Excel Files")
-        am_log_file = st.file_uploader("Upload AM LOG Excel file", type=["xlsx"])
-        zsd_po_file = st.file_uploader("Upload ZSD_PO_PER_SO Excel file", type=["xlsx"])
-        zstatus_file = st.file_uploader("Upload ZSTATUS Excel file", type=["xlsx"])
-        preview = st.toggle("Toon tijdelijke previews", value=True)
+    # Sidebar voor uploads en preview toggle
+    st.sidebar.header("Upload Excel Files")
+    am_log_file = st.sidebar.file_uploader("Upload AM LOG Excel file", type=["xlsx"])
+    zsd_po_file = st.sidebar.file_uploader("Upload ZSD_PO_PER_SO Excel file", type=["xlsx"])
+    zstatus_file = st.sidebar.file_uploader("Upload ZSTATUS Excel file", type=["xlsx"])
+    preview = st.sidebar.toggle("Toon tijdelijke previews", value=True)
 
-    if st.button("Process Files"):
+    if st.sidebar.button("Process Files"):
         if am_log_file and zsd_po_file and zstatus_file:
             am_log_data = load_am_log(am_log_file)
             zsd_po_data = load_zsd_po_per_so(zsd_po_file)
             zstatus_data = load_zstatus(zstatus_file)
-
-            if preview:
-                with col2:
-                    st.subheader("AM LOG Data")
-                    st.write(am_log_data)
-                    st.subheader("ZSD_PO_PER_SO Data")
-                    st.write(zsd_po_data)
-                    st.subheader("ZSTATUS Data")
-                    st.write(zstatus_data)
 
             # Filter AM LOG data
             material_numbers = [
@@ -44,15 +33,9 @@ def main():
                 ["Serial number", "Customer Reference", "Delivery Date"]
             ]
 
-            st.subheader("Gefilterde AM LOG Data")
-            st.dataframe(filtered_am_log)
-            st.write(f"Aantal overgebleven lijnen na filtering: {len(filtered_am_log)}")
-
-            # Zorg dat de merge kolommen strings zijn en verwijder .0 indien nodig
             filtered_am_log["Customer Reference"] = filtered_am_log["Customer Reference"].astype(str).str.strip()
             zsd_po_data["Purch.Doc."] = zsd_po_data["Purch.Doc."].apply(lambda x: str(int(x)) if pd.notnull(x) and str(x).endswith('.0') else str(x)).str.strip()
 
-            # Merge gefilterde AM LOG met ZSD_PO_PER_SO op Customer Reference / Purch.Doc.
             merged_data = filtered_am_log.merge(
                 zsd_po_data,
                 left_on="Customer Reference",
@@ -60,7 +43,6 @@ def main():
                 how="inner"
             )
 
-            # Selecteer gewenste kolommen uit beide datasets
             output_data = merged_data[[
                 "Serial number",
                 "Customer Reference",
@@ -69,11 +51,6 @@ def main():
                 "Document"
             ]]
 
-            st.subheader("Gecombineerde Output Data")
-            st.dataframe(output_data)
-            st.write(f"Aantal lijnen in output: {len(output_data)}")
-            
-            # Tweede filter: alleen gewenste Material referenties
             allowed_materials = [
                 "ATL3.2_12X8N/H", "ATL3.3_12X10CM", "ATL3.3_12X12N/H", "ATL3.3_12X10C", "ATL3.3_12X10N",
                 "ATL3.3_12X8C", "ATL3.3_12X8N", "ATL3.3_10X12N", "ATL3.3_12X8NM", "ATL3.3_115X100N",
@@ -94,16 +71,10 @@ def main():
             ]
             output_data = output_data[output_data["Material"].isin(allowed_materials)]
 
-            # Voeg Year en Month of construction toe
             output_data["Delivery Date"] = pd.to_datetime(output_data["Delivery Date"], errors="coerce")
             output_data["Year of construction"] = output_data["Delivery Date"].dt.year
             output_data["Month of construction"] = output_data["Delivery Date"].dt.month
 
-            st.subheader("Gecombineerde Output Data (na Material-filter)")
-            st.dataframe(output_data)
-            st.write(f"Aantal lijnen in output: {len(output_data)}")
-
-            # Merge met ZSTATUS op "Document"
             zstatus_data["Document"] = zstatus_data["Document"].astype(str).str.strip()
             output_data["Document"] = output_data["Document"].astype(str).str.strip()
 
@@ -113,26 +84,23 @@ def main():
                 how="left"
             )
 
-            # Voeg "Begin Guarantee" toe: "Date OKWV" + 2 maanden
             final_output["Date OKWV"] = pd.to_datetime(final_output["Date OKWV"], errors="coerce")
             final_output["Begin Guarantee"] = final_output["Date OKWV"] + pd.DateOffset(months=2)
 
-            # Bereken "Warranty end date"
-            # Eerst "Begin Guarantee" terug naar datetime voor berekening
-            begin_guarantee_dt = pd.to_datetime(final_output["Begin Guarantee"], format="%d-%m-%Y", errors="coerce")
+            begin_guarantee_dt = pd.to_datetime(final_output["Begin Guarantee"], errors="coerce")
             final_output["Warranty end date"] = begin_guarantee_dt + pd.to_timedelta(
                 final_output["CoSPa"].apply(lambda x: 2*365 if str(x).strip() == "DE" else 365), unit="D"
             )
             final_output["Warranty end date"] = final_output["Warranty end date"].dt.strftime("%d-%m-%Y")
-
-            # Zet datumkolommen om naar DD-MM-YYYY formaat
             final_output["Delivery Date"] = final_output["Delivery Date"].dt.strftime("%d-%m-%Y")
             final_output["Date OKWV"] = final_output["Date OKWV"].dt.strftime("%d-%m-%Y")
             final_output["Begin Guarantee"] = final_output["Begin Guarantee"].dt.strftime("%d-%m-%Y")
 
-            st.subheader("Final Output Data (met ZSTATUS info, Begin Guarantee en Warranty end date)")
+            # Toon alleen output preview als preview slider aan staat
+            st.subheader("Final Output Data")
             st.dataframe(final_output)
             st.write(f"Aantal lijnen in final output: {len(final_output)}")
+
         else:
             st.error("Please upload all three Excel files.")
 
