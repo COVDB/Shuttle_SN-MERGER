@@ -90,6 +90,11 @@ def main():
             ]
             output_data = output_data[output_data["Material"].isin(allowed_materials)]
 
+            # Voeg Year en Month of construction toe
+            output_data["Delivery Date"] = pd.to_datetime(output_data["Delivery Date"], errors="coerce")
+            output_data["Year of construction"] = output_data["Delivery Date"].dt.year
+            output_data["Month of construction"] = output_data["Delivery Date"].dt.month
+
             st.subheader("Gecombineerde Output Data (na Material-filter)")
             st.dataframe(output_data)
             st.write(f"Aantal lijnen in output: {len(output_data)}")
