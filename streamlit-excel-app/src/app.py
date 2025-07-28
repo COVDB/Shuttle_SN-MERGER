@@ -3,7 +3,7 @@ import pandas as pd
 from utils.excel_loader import load_am_log, load_zsd_po_per_so, load_zstatus
 
 def main():
-    st.image("assets/stow_jpg (1).jpg", width=250)
+    st.image("assets/stow.jpg", width=250)
     st.title("Excel File Upload and Processing")
 
     # Sidebar voor uploads en preview toggle
