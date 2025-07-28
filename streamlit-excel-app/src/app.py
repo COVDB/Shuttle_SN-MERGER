@@ -41,7 +41,7 @@ def main():
             ]
 
             st.subheader("Gefilterde AM LOG Data")
-            st.write(filtered_am_log)
+            st.dataframe(filtered_am_log)
         else:
             st.error("Please upload all three Excel files.")
 
