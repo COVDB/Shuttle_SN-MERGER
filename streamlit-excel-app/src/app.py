@@ -109,7 +109,11 @@ def main():
                 how="left"
             )
 
-            st.subheader("Final Output Data (met ZSTATUS info)")
+            # Voeg "Begin Guarantee" toe: "Date OKWV" + 2 maanden
+            final_output["Date OKWV"] = pd.to_datetime(final_output["Date OKWV"], errors="coerce")
+            final_output["Begin Guarantee"] = final_output["Date OKWV"] + pd.DateOffset(months=2)
+
+            st.subheader("Final Output Data (met ZSTATUS info en Begin Guarantee)")
             st.dataframe(final_output)
             st.write(f"Aantal lijnen in final output: {len(final_output)}")
         else:
