@@ -113,12 +113,20 @@ def main():
             final_output["Date OKWV"] = pd.to_datetime(final_output["Date OKWV"], errors="coerce")
             final_output["Begin Guarantee"] = final_output["Date OKWV"] + pd.DateOffset(months=2)
 
+            # Bereken "Warranty end date"
+            # Eerst "Begin Guarantee" terug naar datetime voor berekening
+            begin_guarantee_dt = pd.to_datetime(final_output["Begin Guarantee"], format="%d-%m-%Y", errors="coerce")
+            final_output["Warranty end date"] = begin_guarantee_dt + pd.to_timedelta(
+                final_output["CoSPa"].apply(lambda x: 2*365 if str(x).strip() == "DE" else 365), unit="D"
+            )
+            final_output["Warranty end date"] = final_output["Warranty end date"].dt.strftime("%d-%m-%Y")
+
             # Zet datumkolommen om naar DD-MM-YYYY formaat
             final_output["Delivery Date"] = final_output["Delivery Date"].dt.strftime("%d-%m-%Y")
             final_output["Date OKWV"] = final_output["Date OKWV"].dt.strftime("%d-%m-%Y")
             final_output["Begin Guarantee"] = final_output["Begin Guarantee"].dt.strftime("%d-%m-%Y")
 
-            st.subheader("Final Output Data (met ZSTATUS info en Begin Guarantee)")
+            st.subheader("Final Output Data (met ZSTATUS info, Begin Guarantee en Warranty end date)")
             st.dataframe(final_output)
             st.write(f"Aantal lijnen in final output: {len(final_output)}")
         else:
