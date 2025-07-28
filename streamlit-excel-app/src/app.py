@@ -96,10 +96,59 @@ def main():
             final_output["Date OKWV"] = final_output["Date OKWV"].dt.strftime("%d-%m-%Y")
             final_output["Begin Guarantee"] = final_output["Begin Guarantee"].dt.strftime("%d-%m-%Y")
 
-            # Toon alleen output preview als preview slider aan staat
+            # Maak een lege DataFrame met de gewenste kolommen
+            final_columns = [
+                "Equipment Number",
+                "Date valid from",
+                "Equipment category",
+                "Description",
+                "Sold to partner",
+                "Ship to partner",
+                "Material Number",
+                "Serial number",
+                "Begin Guarantee",
+                "Warranty end date",
+                "Indicator, Whether Technical Object Should Inherit Warranty",
+                "Indicator: Pass on Warranty",
+                "Construction year",
+                "Construction month"
+            ]
+            final_output = pd.DataFrame(columns=final_columns)
+
+            # TODO: Vul final_output met de juiste data uit je merge/resultaten
+
             st.subheader("Final Output Data")
             st.dataframe(final_output)
             st.write(f"Aantal lijnen in final output: {len(final_output)}")
+
+            # Download opties
+            st.subheader("Download finale output")
+            file_type = st.selectbox("Kies bestandsformaat", ["csv", "xlsx", "tabulator txt"])
+            if file_type == "csv":
+                st.download_button(
+                    label="Download als CSV",
+                    data=final_output.to_csv(index=False).encode("utf-8"),
+                    file_name="final_output.csv",
+                    mime="text/csv"
+                )
+            elif file_type == "xlsx":
+                import io
+                buffer = io.BytesIO()
+                with pd.ExcelWriter(buffer, engine="xlsxwriter") as writer:
+                    final_output.to_excel(writer, index=False)
+                st.download_button(
+                    label="Download als XLSX",
+                    data=buffer.getvalue(),
+                    file_name="final_output.xlsx",
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                )
+            elif file_type == "tabulator txt":
+                st.download_button(
+                    label="Download als TXT (tab gescheiden)",
+                    data=final_output.to_csv(index=False, sep="\t").encode("utf-8"),
+                    file_name="final_output.txt",
+                    mime="text/plain"
+                )
 
         else:
             st.error("Please upload all three Excel files.")
