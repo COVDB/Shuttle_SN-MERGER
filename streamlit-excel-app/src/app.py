@@ -98,6 +98,20 @@ def main():
             st.subheader("Gecombineerde Output Data (na Material-filter)")
             st.dataframe(output_data)
             st.write(f"Aantal lijnen in output: {len(output_data)}")
+
+            # Merge met ZSTATUS op "Document"
+            zstatus_data["Document"] = zstatus_data["Document"].astype(str).str.strip()
+            output_data["Document"] = output_data["Document"].astype(str).str.strip()
+
+            final_output = output_data.merge(
+                zstatus_data[["Document", "Sold-to pt", "Ship-to", "CoSPa", "Date OKWV"]],
+                on="Document",
+                how="left"
+            )
+
+            st.subheader("Final Output Data (met ZSTATUS info)")
+            st.dataframe(final_output)
+            st.write(f"Aantal lijnen in final output: {len(final_output)}")
         else:
             st.error("Please upload all three Excel files.")
 
