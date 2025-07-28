@@ -4,6 +4,7 @@ from utils.excel_loader import load_am_log, load_zsd_po_per_so, load_zstatus
 
 def main():
     st.title("Excel File Upload and Processing")
+    st.image("assets/stow_logo.jpg", width=250)
 
     # Sidebar voor uploads en preview toggle
     st.sidebar.header("Upload Excel Files")
