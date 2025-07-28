@@ -45,8 +45,8 @@ def main():
             st.write(f"Aantal overgebleven lijnen na filtering: {len(filtered_am_log)}")
 
             # Zorg dat de merge kolommen strings zijn
-            filtered_am_log["Customer Reference"] = filtered_am_log["Customer Reference"].astype(str)
-            zsd_po_data["Purch.Doc."] = zsd_po_data["Purch.Doc."].astype(str)
+            filtered_am_log["Customer Reference"] = filtered_am_log["Customer Reference"].str.strip()
+            zsd_po_data["Purch.Doc."] = zsd_po_data["Purch.Doc."].str.strip()
 
             # Merge gefilterde AM LOG met ZSD_PO_PER_SO op Customer Reference / Purch.Doc.
             merged_data = filtered_am_log.merge(
@@ -68,6 +68,11 @@ def main():
             st.subheader("Gecombineerde Output Data")
             st.dataframe(output_data)
             st.write(f"Aantal lijnen in output: {len(output_data)}")
+            
+            st.write(filtered_am_log["Customer Reference"].unique())
+            st.write(zsd_po_data["Purch.Doc."].unique())
+            st.write(filtered_am_log["Customer Reference"].isnull().sum())
+            st.write(zsd_po_data["Purch.Doc."].isnull().sum())
         else:
             st.error("Please upload all three Excel files.")
 
