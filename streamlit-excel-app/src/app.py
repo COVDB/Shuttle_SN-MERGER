@@ -105,6 +105,26 @@ def main():
             final_output["Date OKWV"] = final_output["Date OKWV"].dt.strftime("%d-%m-%Y")
             final_output["Begin Guarantee"] = final_output["Begin Guarantee"].dt.strftime("%d-%m-%Y")
 
+            # Maak de finale output met de juiste kolommen en mapping
+            from datetime import datetime
+
+            final_output = pd.DataFrame({
+                "Equipment Number": "",  # leeg veld
+                "Date valid from": datetime.now().strftime("%d-%m-%Y"),  # datum van aanmaak
+                "Equipment category": "S",  # vaste waarde
+                "Description": merged_data["Description"],  # uit ZSD file, gefilterd
+                "Sold to partner": final_output["Sold-to pt"],
+                "Ship to partner": final_output["Ship-to"],
+                "Material Number": output_data["Material"],
+                "Serial number": output_data["Serial number"],
+                "Begin Guarantee": final_output["Begin Guarantee"],
+                "Warranty end date": final_output["Warranty end date"],
+                "Indicator, Whether Technical Object Should Inherit Warranty": "X",  # vaste waarde
+                "Indicator: Pass on Warranty": "X",  # vaste waarde
+                "Construction year": output_data["Year of construction"],
+                "Construction month": output_data["Month of construction"]
+            })
+
             # Preview van de gefilterde en gemergede data
             st.subheader("Preview gefilterde en gemergede data")
             st.dataframe(final_output)
