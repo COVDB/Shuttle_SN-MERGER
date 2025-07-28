@@ -5,12 +5,13 @@ from utils.excel_loader import load_am_log, load_zsd_po_per_so, load_zstatus
 def main():
     st.title("Excel File Upload and Processing")
 
-    # Sidebar voor uploads en preview toggle
+    # Sidebar voor uploads, preview toggle en output type keuze
     st.sidebar.header("Upload Excel Files")
     am_log_file = st.sidebar.file_uploader("Upload AM LOG Excel file", type=["xlsx"])
     zsd_po_file = st.sidebar.file_uploader("Upload ZSD_PO_PER_SO Excel file", type=["xlsx"])
     zstatus_file = st.sidebar.file_uploader("Upload ZSTATUS Excel file", type=["xlsx"])
     preview = st.sidebar.toggle("Toon tijdelijke previews", value=True)
+    file_type = st.sidebar.selectbox("Kies final output formaat", ["csv", "xlsx", "tabulator txt"])
 
     if st.sidebar.button("Process Files"):
         if am_log_file and zsd_po_file and zstatus_file:
@@ -57,7 +58,8 @@ def main():
                 "Customer Reference",
                 "Delivery Date",
                 "Material",
-                "Document"
+                "Document",
+                "Description"
             ]]
 
             allowed_materials = [
@@ -108,38 +110,37 @@ def main():
             # Maak de finale output met de juiste kolommen en mapping
             from datetime import datetime
 
-            final_output = pd.DataFrame({
+            download_output = pd.DataFrame({
                 "Equipment Number": "",  # leeg veld
                 "Date valid from": datetime.now().strftime("%d-%m-%Y"),  # datum van aanmaak
                 "Equipment category": "S",  # vaste waarde
-                "Description": merged_data["Description"],  # uit ZSD file, gefilterd
+                "Description": final_output["Description"],
                 "Sold to partner": final_output["Sold-to pt"],
                 "Ship to partner": final_output["Ship-to"],
-                "Material Number": output_data["Material"],
-                "Serial number": output_data["Serial number"],
+                "Material Number": final_output["Material"],
+                "Serial number": final_output["Serial number"],
                 "Begin Guarantee": final_output["Begin Guarantee"],
                 "Warranty end date": final_output["Warranty end date"],
                 "Indicator, Whether Technical Object Should Inherit Warranty": "X",  # vaste waarde
                 "Indicator: Pass on Warranty": "X",  # vaste waarde
-                "Construction year": output_data["Year of construction"],
-                "Construction month": output_data["Month of construction"]
+                "Construction year": final_output["Year of construction"],
+                "Construction month": final_output["Month of construction"]
             })
 
-            # Preview van de gefilterde en gemergede data
-            st.subheader("Preview gefilterde en gemergede data")
-            st.dataframe(final_output)
+            # Preview van het downloadbaar document
+            st.subheader("Preview van het downloadbaar document")
+            st.dataframe(download_output)
 
             st.subheader("Final Output Data")
-            st.dataframe(final_output)
-            st.write(f"Aantal lijnen in final output: {len(final_output)}")
+            st.dataframe(download_output)
+            st.write(f"Aantal lijnen in final output: {len(download_output)}")
 
             # Download opties
             st.subheader("Download finale output")
-            file_type = st.selectbox("Kies bestandsformaat", ["csv", "xlsx", "tabulator txt"])
             if file_type == "csv":
                 st.download_button(
                     label="Download als CSV",
-                    data=final_output.to_csv(index=False).encode("utf-8"),
+                    data=download_output.to_csv(index=False).encode("utf-8"),
                     file_name="final_output.csv",
                     mime="text/csv"
                 )
@@ -147,7 +148,7 @@ def main():
                 import io
                 buffer = io.BytesIO()
                 with pd.ExcelWriter(buffer, engine="xlsxwriter") as writer:
-                    final_output.to_excel(writer, index=False)
+                    download_output.to_excel(writer, index=False)
                 st.download_button(
                     label="Download als XLSX",
                     data=buffer.getvalue(),
@@ -157,7 +158,7 @@ def main():
             elif file_type == "tabulator txt":
                 st.download_button(
                     label="Download als TXT (tab gescheiden)",
-                    data=final_output.to_csv(index=False, sep="\t").encode("utf-8"),
+                    data=download_output.to_csv(index=False, sep="\t").encode("utf-8"),
                     file_name="final_output.txt",
                     mime="text/plain"
                 )
